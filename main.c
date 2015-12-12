@@ -30,7 +30,7 @@ int check_block_plus(char *str, int x)
 	return (0);
 }
 
-int		check_block(char *str)
+int	check_block(char *str)
 {
 	int x;
 	int count_chars;
@@ -58,7 +58,134 @@ int		check_block(char *str)
 }
 
 
+int power_x(int x)
+{
+	int y;
+	int tmp;
 
+	y = x;
+	tmp = 1;
+	while (tmp < y)
+	{
+		x += y;
+		tmp++;
+	}
+	return (x);
+}
+
+
+
+char *create_tableau(int size)
+{
+	int x;
+	int len;
+	int i;
+	int tmp;
+	char *final_tab;
+
+	x = 2;
+	i = 0;
+	while (power_x(x) < (size * 4))
+		x++;
+	tmp = (power_x(x) + x);
+	final_tab = (char *)ft_memalloc(sizeof(char) * (tmp + 1));
+	while (i < tmp)
+	{
+		len = x;
+		while (len--)
+		{
+			final_tab[i] = '.';
+			i++;
+		}
+		final_tab[i] = '\n';
+		i++;
+	}
+	ft_putendl(final_tab);
+	return (final_tab);
+}
+
+
+
+
+/* typedef struct		su_list
+{
+	
+	sruct piece 	*p;
+	int				tetri_nuber;
+	struct su_list	*next;
+}					t_tetri;
+
+
+sruct piece
+{
+	int	x;
+	int	y;
+	sruct piece *next;;
+} */
+
+
+char *cut_tetri(char *tetri)
+{
+	int i;
+	int x;
+	int count_diezes;
+	char *tmp;
+
+	i = 0;
+	x = 0;
+	count_diezes = 0;
+	tmp = (char *)ft_memalloc(sizeof(char) * 9);
+	while (tetri[i] && count_diezes < 4)
+	{
+		if (tetri[i] == '#' && (tetri[i + 4] == '#' || tetri[i + 9] == '#') && count_diezes == 0)
+		{
+			tmp[x] = '.';
+			x++;
+			tmp[x] = '#';
+			x++;
+			count_diezes++;
+		}
+		else if (tetri[i] == '#' && tetri[i - 6] == '#')
+		{
+			tmp[x] = '.';
+			x++;
+			tmp[x] = '#';
+			x++;
+			count_diezes++;
+		}
+		else if (tetri[i] == '#')
+		{
+			tmp[x] = '#';
+			x++;
+			count_diezes++;
+		}
+		else if (tetri[i] == '\n')
+		{
+			tmp[x] = '\n';
+			x++;
+		}
+
+		i++;
+	}
+//		tmp[x] = '\n';
+	return (tmp);
+}
+
+void super_putendl(char *mainlist, t_tetri *tetri)
+{
+	int i;
+
+	i = 0;
+	while (mainlist[i])
+	{
+	 if (mainlist[i] == '#')
+	 	ft_putchar(tetri->tetri_nuber + 'A');
+	 else
+	 	ft_putchar(mainlist[i]);
+	 i++;
+	}
+	ft_putchar('\n');
+}
 
 t_tetri	*create_list_element(char  *tetriminos, int x)
 {
@@ -67,7 +194,7 @@ t_tetri	*create_list_element(char  *tetriminos, int x)
 	new_tetri = (t_tetri *)malloc(sizeof(t_tetri));
 	if (!new_tetri)
 		return (NULL);
-	new_tetri->tetri = tetriminos;
+	new_tetri->tetri = cut_tetri(tetriminos);
 	new_tetri->tetri_nuber = x;
 	new_tetri->next = NULL;
 	return (new_tetri);
@@ -91,6 +218,7 @@ t_tetri *add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 	return (head);
 }
 
+
 //int test_plus(t_tetri *mainlist, int *final_carre)
 //{
 //}
@@ -99,9 +227,9 @@ void test(t_tetri *mainlist, int carre)
 {
 	int x;
 	int i;
-	char **final_carre;
+	char *final_carre;
 
-	/*final_carre = (char **)ft_memalloc(sizeof(char *) * ((carre + 1) * 4));
+	/*
 	
 	i = 0;
 	x = 0;
@@ -119,10 +247,7 @@ void test(t_tetri *mainlist, int carre)
 	while (mainlist != NULL)
 	{
 		x++;
-		ft_putchar(mainlist->tetri_nuber + 'A');
-		ft_putchar('\n');
-		ft_putendl(mainlist->tetri);
-		ft_putchar('\n');
+		super_putendl(mainlist->tetri, mainlist);
 		mainlist = mainlist->next;
 	}
 }
@@ -166,7 +291,6 @@ int		main(int ac, char **av)
 	int 	fi;
 	char	buf[1025];
 	int		r;
-
 
 	if (ac == 2)
 	{
