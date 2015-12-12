@@ -37,7 +37,7 @@ int		check_block(char *str)
 	int count_diezes;
 	int t;
 
-	t = 1;
+	t = 0;
 	x = -1;
 	count_chars = 0;
 	count_diezes = 0;
@@ -150,13 +150,10 @@ int		check_tetri(char *str)
 		x += i;
 		if(i != 20 || !(check_block(tmp)))
 			return (0);
-		//ft_putnbr(x % 20);
-		//ft_putchar('\n');
 		if (str[x] == '\n' && str[x + 1] != '.' && str[x + 1] != '#')
 			return (0);
 		l_tmp = create_list_element(tmp, (x % 20));
 		head = add_on_list(head	, l_tmp, (x % 20));
-
 		x++;
 	}
 	x--;
