@@ -23,12 +23,22 @@ typedef struct		s_list
 	struct s_list	*next;
 }					t_list;
 
- typedef struct		su_list
+typedef struct		s_piece
 {
-	char            *tetri;
+	int				x;
+	int				y;
+	struct s_piece	*next;
+	struct s_piece	*prev;
+}					t_piece;
+
+typedef struct		su_list
+{
+	t_piece         *p;
 	int				tetri_nuber;
 	struct su_list	*next;
 }					t_tetri;
+
+
 
 size_t				ft_strlen(const char *nb);
 size_t				ft_strlcat(char *dst, const char *src, size_t size);

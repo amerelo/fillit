@@ -6,7 +6,7 @@
 /*   By: amerelo <amerelo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/04 15:01:57 by amerelo           #+#    #+#             */
-/*   Updated: 2015/12/10 05:49:36 by amerelo          ###   ########.fr       */
+/*   Updated: 2015/12/13 18:09:27 by amerelo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,13 +50,32 @@ int	check_block(char *str)
 			count_diezes++;
 		if (str[x] == '#' && check_block_plus(str, x) &&  !t--)
 			count_diezes++;
-		count_chars++;
+		if (str[x] == '.')
+			count_chars++;
 	}
-	if (count_chars == 20 && count_diezes == 5)
+	if (count_chars == 12 && count_diezes == 5)
 		return (1);
 	return (0);
 }
 
+void ft_puttab(char **tab) // test...................................................................................................
+{
+	int x;
+	int y;
+
+	x = 0;
+	while (tab[x])
+	{
+		y = 0;
+		while(tab[x][y])
+		{
+			ft_putchar(tab[x][y]);
+			y++;
+		}
+		x++;
+	}
+	ft_putchar('\n');
+}
 
 int power_x(int x)
 {
@@ -74,104 +93,38 @@ int power_x(int x)
 }
 
 
-
-char *create_tableau(int size)
+char **create_tableau(int size)
 {
+	int size_cube;
 	int x;
+	int y;
 	int len;
-	int i;
-	int tmp;
-	char *final_tab;
+	char **final_tab;
 
-	x = 2;
-	i = 0;
-	while (power_x(x) < (size * 4))
-		x++;
-	tmp = (power_x(x) + x);
-	final_tab = (char *)ft_memalloc(sizeof(char) * (tmp + 1));
-	while (i < tmp)
+	size_cube = 2;	
+	while (power_x(size_cube) < (size * 4))
+		size_cube++;
+	final_tab = (char **)ft_memalloc(sizeof(char *) * (size_cube + 1));
+	x = 0;
+	while (x < size_cube )
 	{
-		len = x;
-		while (len--)
+		final_tab[x] = (char *)ft_memalloc(sizeof(char ) * (size_cube + 2));
+
+		y = 0;
+		while (y < size_cube )
 		{
-			final_tab[i] = '.';
-			i++;
+			final_tab[x][y] = '.';
+			y++;
 		}
-		final_tab[i] = '\n';
-		i++;
+		final_tab[x][y] = '\n';
+		x++;
 	}
-	ft_putendl(final_tab);
+
+	ft_puttab(final_tab);
 	return (final_tab);
 }
 
-
-
-
-/* typedef struct		su_list
-{
-	
-	sruct piece 	*p;
-	int				tetri_nuber;
-	struct su_list	*next;
-}					t_tetri;
-
-
-sruct piece
-{
-	int	x;
-	int	y;
-	sruct piece *next;;
-} */
-
-
-char *cut_tetri(char *tetri)
-{
-	int i;
-	int x;
-	int count_diezes;
-	char *tmp;
-
-	i = 0;
-	x = 0;
-	count_diezes = 0;
-	tmp = (char *)ft_memalloc(sizeof(char) * 9);
-	while (tetri[i] && count_diezes < 4)
-	{
-		if (tetri[i] == '#' && (tetri[i + 4] == '#' || tetri[i + 9] == '#') && count_diezes == 0)
-		{
-			tmp[x] = '.';
-			x++;
-			tmp[x] = '#';
-			x++;
-			count_diezes++;
-		}
-		else if (tetri[i] == '#' && tetri[i - 6] == '#')
-		{
-			tmp[x] = '.';
-			x++;
-			tmp[x] = '#';
-			x++;
-			count_diezes++;
-		}
-		else if (tetri[i] == '#')
-		{
-			tmp[x] = '#';
-			x++;
-			count_diezes++;
-		}
-		else if (tetri[i] == '\n')
-		{
-			tmp[x] = '\n';
-			x++;
-		}
-
-		i++;
-	}
-//		tmp[x] = '\n';
-	return (tmp);
-}
-
-void super_putendl(char *mainlist, t_tetri *tetri)
+void super_putendl(char *mainlist, t_tetri *tetri) // test.................................................................................
 {
 	int i;
 
@@ -187,6 +140,51 @@ void super_putendl(char *mainlist, t_tetri *tetri)
 	ft_putchar('\n');
 }
 
+
+
+
+
+
+
+
+
+t_piece *cut_tetri(char *tetri)
+{
+	int 		x;
+	t_piece		*p;
+	t_piece 	*tmp;
+
+	p = NULL;
+	x = 0;
+	while (tetri[x] != '\0')
+	{
+		if(tetri[x] == '#')
+		{
+			tmp = (t_piece *)malloc(sizeof(t_piece));
+			tmp->x = x % 5;
+			tmp->y = x / 5;
+			tmp->next = NULL;
+			tmp->prev = p;
+			p = (p == NULL ? tmp : p);
+			p->next = (p == NULL ? NULL : tmp);
+			p = (p == NULL ? p : p->next);
+		}
+		x++;
+	}
+	while (p->prev)
+		p = p->prev;
+	return (p);
+}
+
+
+
+
+
+
+
+
+
+
 t_tetri	*create_list_element(char  *tetriminos, int x)
 {
 	t_tetri *new_tetri;
@@ -194,7 +192,8 @@ t_tetri	*create_list_element(char  *tetriminos, int x)
 	new_tetri = (t_tetri *)malloc(sizeof(t_tetri));
 	if (!new_tetri)
 		return (NULL);
-	new_tetri->tetri = cut_tetri(tetriminos);
+
+	new_tetri->p = cut_tetri(tetriminos);
 	new_tetri->tetri_nuber = x;
 	new_tetri->next = NULL;
 	return (new_tetri);
@@ -218,10 +217,6 @@ t_tetri *add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 	return (head);
 }
 
-
-//int test_plus(t_tetri *mainlist, int *final_carre)
-//{
-//}
 
 void test(t_tetri *mainlist, int carre)
 {
@@ -247,7 +242,7 @@ void test(t_tetri *mainlist, int carre)
 	while (mainlist != NULL)
 	{
 		x++;
-		super_putendl(mainlist->tetri, mainlist);
+	//	super_putendl(mainlist->tetri, mainlist);
 		mainlist = mainlist->next;
 	}
 }
@@ -266,8 +261,8 @@ int		check_tetri(char *str)
 		if (!(tmp = (char *)ft_memalloc(sizeof(char) * 21)))
 			return (0);
 		i = 0;
-		while (i < 20 && str[i + x] && (str[i + x] == '.' || str[i + x] == '#' ||
-		 str[i + x] == '\n'))
+		while (i < 20 && str[i + x] && (str[i + x] == '.' || str[i + x] == '#'
+		 || str[i + x] == '\n'))
 		{
 			tmp[i] = str[i + x];
 			i++;
@@ -282,9 +277,10 @@ int		check_tetri(char *str)
 		x++;
 	}
 	x--;
-	test (head, (x % 20 + 1) );
+	//test (head, (x % 20 + 1) );
 	return (1);
 }
+
 
 int		main(int ac, char **av)
 {
@@ -299,14 +295,20 @@ int		main(int ac, char **av)
 		{
 			r = read(fi, buf, 1024);
 			buf[r] = '\0';
-			if (!check_tetri(buf))
+			if (r > 0  && !check_tetri(buf))
 			{
 				ft_putendl("error");
 				close(fi);
 				return (-1);
 			}
+			else
+				ft_putendl("error");
 			close(fi);
 		}
+		else
+			ft_putendl("error");
 	}
+	else
+		ft_putendl("error");
 	return (0);
 }
