@@ -13,6 +13,9 @@
 #include "libft.h"
 #include <fcntl.h>
 
+
+
+
 int check_block_plus(char *str, int x)
 {
 	if (str[x - 1] == '#' && str[x - 5] == '#')
@@ -58,6 +61,8 @@ int	check_block(char *str)
 	return (0);
 }
 
+
+
 void ft_puttab(char **tab) // test...................................................................................................
 {
 	int x;
@@ -101,7 +106,7 @@ char **create_tableau(int size)
 	int len;
 	char **final_tab;
 
-	size_cube = 2;	
+	size_cube = 2;
 	while (power_x(size_cube) < (size * 4))
 		size_cube++;
 	final_tab = (char **)ft_memalloc(sizeof(char *) * (size_cube + 1));
@@ -119,8 +124,6 @@ char **create_tableau(int size)
 		final_tab[x][y] = '\n';
 		x++;
 	}
-
-	ft_puttab(final_tab);
 	return (final_tab);
 }
 
@@ -148,6 +151,35 @@ void super_putendl(char *mainlist, t_tetri *tetri) // test......................
 
 
 
+
+
+t_piece *cut_tetri_plus(t_piece *p)
+{
+	int xtmp;
+	int ytmp;
+
+	ytmp = p->y;
+	xtmp = p->x;
+	while (p->next != NULL)
+	{
+		ytmp = (ytmp >  p->y ? p->y : ytmp);
+		xtmp = (xtmp >  p->x ? p->x : xtmp);
+		p = p->next;
+	}
+		ytmp = (ytmp >  p->y ? p->y : ytmp);
+		xtmp = (xtmp >  p->x ? p->x : xtmp);
+	while (p->prev != NULL)
+	{
+		p->y -= ytmp;
+		p->x -= xtmp;
+		p = p->prev;
+	}
+		p->y -= ytmp;
+		p->x -= xtmp;	
+	return (p);
+}
+
+
 t_piece *cut_tetri(char *tetri)
 {
 	int 		x;
@@ -173,14 +205,9 @@ t_piece *cut_tetri(char *tetri)
 	}
 	while (p->prev)
 		p = p->prev;
+	p = cut_tetri_plus(p);
 	return (p);
 }
-
-
-
-
-
-
 
 
 
@@ -218,34 +245,128 @@ t_tetri *add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 }
 
 
-void test(t_tetri *mainlist, int carre)
+
+
+
+
+
+
+
+
+
+
+int  test_2(t_tetri *mainlist, char **final_carre, int x, int y)
 {
-	int x;
-	int i;
-	char *final_carre;
 
-	/*
-	
-	i = 0;
-	x = 0;
-	while (mainlist->tetri[i])
-	{	
-		while (mainlist->tetri[x] != '#')
-			x++;
-		if (mainlist->tetri[i] == '#')
-		{
-
-		}
-		i++;
-	}*/
-
-	while (mainlist != NULL)
+	while (mainlist->p->next != NULL)
 	{
-		x++;
-	//	super_putendl(mainlist->tetri, mainlist);
-		mainlist = mainlist->next;
+		ft_putendl("Hola");
+		if (final_carre[y + mainlist->p->y][x + mainlist->p->x]  == '.')
+		{
+					ft_putendl("A");
+			mainlist->p = mainlist->p->next;
+					ft_putendl("B");
+		}
+		else
+		{
+			ft_putendl("1");
+			while (mainlist->p->prev)
+				mainlist->p = mainlist->p->prev;
+			ft_putendl("2");
+			return (0);
+		}
+	}
+	ft_putendl("Hola");
+	if (final_carre[y + mainlist->p->y][x + mainlist->p->x] )
+	{
+		ft_putendl("TY");
+		while (mainlist->p->prev)
+			mainlist->p = mainlist->p->prev;
+		ft_putendl("VY");
+		return (1);
+	}
+	else
+	{
+		ft_putendl("x");
+		while (mainlist->p->prev)
+			mainlist->p = mainlist->p->prev;
+		ft_putendl("y");
+		return (0);
 	}
 }
+
+
+void test(t_tetri *mainlist, char **final_carre, int x, int y)
+{
+	while (mainlist->p->next != NULL)
+	{
+
+		final_carre[y + mainlist->p->y][x + mainlist->p->x] =
+		 mainlist->tetri_nuber + 'A';
+		mainlist->p = mainlist->p->next;
+	}
+	final_carre[y + mainlist->p->y][x + mainlist->p->x]  =
+	 mainlist->tetri_nuber + 'A';
+	while (mainlist->p->prev)
+		mainlist->p = mainlist->p->prev;
+}
+
+	
+
+
+
+
+int solve_tetri_plus(t_tetri *mainlist, char **final_carre)
+{
+	int x;
+	int y;
+
+
+	y = 0;
+	while (final_carre[y]!= '\0' && mainlist != NULL)
+	{
+		x = 0;	
+		while (final_carre[y][x] != '\0' && mainlist != NULL)
+		{
+			if (test_2(mainlist, final_carre, x, y))
+			{
+				test(mainlist, final_carre, x, y);
+				mainlist = mainlist->next;
+			}
+			x++;
+		}
+		y++;
+	}
+	if (mainlist == NULL)
+	{
+		return (1);
+	}
+	else
+	{
+		return (0);
+	}
+}
+
+
+void solve_tetri(t_tetri *mainlist, int size)
+{
+	int x;
+	int y;
+	char **final_carre;
+	t_tetri *tmp;
+
+	tmp = mainlist;	
+	final_carre = create_tableau(size);
+	if (solve_tetri_plus(mainlist, final_carre))
+		ft_puttab(final_carre);
+	else
+	{
+		free (final_carre);
+		solve_tetri(tmp, (size + 1));
+	}
+}
+
+
 
 int		check_tetri(char *str)
 {
@@ -272,14 +393,19 @@ int		check_tetri(char *str)
 			return (0);
 		if (str[x] == '\n' && str[x + 1] != '.' && str[x + 1] != '#')
 			return (0);
+
 		l_tmp = create_list_element(tmp, (x % 20));
 		head = add_on_list(head	, l_tmp, (x % 20));
 		x++;
 	}
 	x--;
-	//test (head, (x % 20 + 1) );
+
+	solve_tetri(head, (x % 20 + 1));
 	return (1);
 }
+
+
+
 
 
 int		main(int ac, char **av)
@@ -295,14 +421,12 @@ int		main(int ac, char **av)
 		{
 			r = read(fi, buf, 1024);
 			buf[r] = '\0';
-			if (r > 0  && !check_tetri(buf))
+			if (r == -1 || !check_tetri(buf))
 			{
 				ft_putendl("error");
 				close(fi);
 				return (-1);
 			}
-			else
-				ft_putendl("error");
 			close(fi);
 		}
 		else
