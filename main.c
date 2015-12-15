@@ -63,21 +63,21 @@ int	check_block(char *str)
 
 
 
-void ft_puttab(char **tab) // test...................................................................................................
+void ft_puttab(char **tab) // test........................................
 {
 	int x;
 	int y;
 
-	x = 0;
-	while (tab[x])
+	y = 0;
+	while (tab[y])
 	{
-		y = 0;
-		while(tab[x][y])
+		x = 0;
+		while(tab[y][x])
 		{
-			ft_putchar(tab[x][y]);
-			y++;
+			ft_putchar(tab[y][x]);
+			x++;
 		}
-		x++;
+		y++;
 	}
 	ft_putchar('\n');
 }
@@ -125,32 +125,7 @@ char **create_tableau(int size)
 		x++;
 	}
 	return (final_tab);
-}
-
-void super_putendl(char *mainlist, t_tetri *tetri) // test.................................................................................
-{
-	int i;
-
-	i = 0;
-	while (mainlist[i])
-	{
-	 if (mainlist[i] == '#')
-	 	ft_putchar(tetri->tetri_nuber + 'A');
-	 else
-	 	ft_putchar(mainlist[i]);
-	 i++;
-	}
-	ft_putchar('\n');
-}
-
-
-
-
-
-
-
-
-
+} 
 
 
 t_piece *cut_tetri_plus(t_piece *p)
@@ -222,6 +197,7 @@ t_tetri	*create_list_element(char  *tetriminos, int x)
 
 	new_tetri->p = cut_tetri(tetriminos);
 	new_tetri->tetri_nuber = x;
+	new_tetri->is_valid = 0;
 	new_tetri->next = NULL;
 	return (new_tetri);
 }
@@ -257,50 +233,37 @@ t_tetri *add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 
 int  test_2(t_tetri *mainlist, char **final_carre, int x, int y)
 {
-
 	while (mainlist->p->next != NULL)
 	{
-		ft_putendl("Hola");
-		if (final_carre[y + mainlist->p->y][x + mainlist->p->x]  == '.')
-		{
-					ft_putendl("A");
+		if (final_carre[y + mainlist->p->y] && final_carre
+			[y + mainlist->p->y][x + mainlist->p->x]  == '.')
 			mainlist->p = mainlist->p->next;
-					ft_putendl("B");
-		}
 		else
 		{
-			ft_putendl("1");
 			while (mainlist->p->prev)
 				mainlist->p = mainlist->p->prev;
-			ft_putendl("2");
 			return (0);
 		}
 	}
-	ft_putendl("Hola");
-	if (final_carre[y + mainlist->p->y][x + mainlist->p->x] )
+	if (final_carre[y + mainlist->p->y] && final_carre
+		[y + mainlist->p->y][x + mainlist->p->x]  == '.')
 	{
-		ft_putendl("TY");
 		while (mainlist->p->prev)
 			mainlist->p = mainlist->p->prev;
-		ft_putendl("VY");
 		return (1);
 	}
 	else
 	{
-		ft_putendl("x");
 		while (mainlist->p->prev)
 			mainlist->p = mainlist->p->prev;
-		ft_putendl("y");
 		return (0);
 	}
 }
-
 
 void test(t_tetri *mainlist, char **final_carre, int x, int y)
 {
 	while (mainlist->p->next != NULL)
 	{
-
 		final_carre[y + mainlist->p->y][x + mainlist->p->x] =
 		 mainlist->tetri_nuber + 'A';
 		mainlist->p = mainlist->p->next;
@@ -311,42 +274,53 @@ void test(t_tetri *mainlist, char **final_carre, int x, int y)
 		mainlist->p = mainlist->p->prev;
 }
 
-	
 
-
-
-
-int solve_tetri_plus(t_tetri *mainlist, char **final_carre)
+int test_isvalid(t_tetri *tmp)
 {
-	int x;
-	int y;
-
-
-	y = 0;
-	while (final_carre[y]!= '\0' && mainlist != NULL)
+	while (tmp != NULL) 
 	{
-		x = 0;	
-		while (final_carre[y][x] != '\0' && mainlist != NULL)
+		if (tmp->is_valid == 0)
+			return (0);
+		tmp = tmp->next;
+	}
+	return (1);
+}
+
+
+
+int solve_tetri_plus(t_tetri *mainlist, char **final_carre, int y, int x)
+{
+	t_tetri *tmp;
+
+	tmp = mainlist;
+	if (test_isvalid(tmp)) //
+		return (1);
+	y = 0;
+	while (final_carre[y] != NULL && tmp != NULL) // if 
+	{
+		x = 0;
+		while (final_carre[y][x] != '\0' && tmp != NULL) // if 
 		{
-			if (test_2(mainlist, final_carre, x, y))
+			while (tmp != NULL) // if 
 			{
-				test(mainlist, final_carre, x, y);
-				mainlist = mainlist->next;
+				if (tmp->is_valid == 0 && test_2(tmp, final_carre, x, y))
+				{
+					tmp->is_valid = 1;
+					test(tmp, final_carre, x, y);
+					ft_puttab(final_carre);
+					if(solve_tetri_plus(mainlist, final_carre, y, x))
+						return (1);
+				}
+				else
+					tmp = tmp->next;
 			}
+			tmp = mainlist;
 			x++;
 		}
 		y++;
 	}
-	if (mainlist == NULL)
-	{
-		return (1);
-	}
-	else
-	{
-		return (0);
-	}
+	return (0);
 }
-
 
 void solve_tetri(t_tetri *mainlist, int size)
 {
@@ -355,18 +329,23 @@ void solve_tetri(t_tetri *mainlist, int size)
 	char **final_carre;
 	t_tetri *tmp;
 
-	tmp = mainlist;	
+	tmp = mainlist;
+	x = 0;
+	y = 0;
 	final_carre = create_tableau(size);
-	if (solve_tetri_plus(mainlist, final_carre))
+	if (solve_tetri_plus(mainlist, final_carre, y, x))
 		ft_puttab(final_carre);
 	else
 	{
 		free (final_carre);
+		while (mainlist)
+		{
+			mainlist->is_valid = 0;
+			mainlist = mainlist->next;
+		}
 		solve_tetri(tmp, (size + 1));
 	}
 }
-
-
 
 int		check_tetri(char *str)
 {
@@ -403,6 +382,15 @@ int		check_tetri(char *str)
 	solve_tetri(head, (x % 20 + 1));
 	return (1);
 }
+
+
+
+
+
+
+
+
+
 
 
 

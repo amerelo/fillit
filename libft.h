@@ -33,8 +33,9 @@ typedef struct		s_piece
 
 typedef struct		su_list
 {
-	t_piece         *p;
+	t_piece			*p;
 	int				tetri_nuber;
+	int				is_valid;
 	struct su_list	*next;
 }					t_tetri;
 
