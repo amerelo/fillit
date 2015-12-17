@@ -13,7 +13,7 @@
 #include "libft.h"
 #include <fcntl.h>
 
-
+int parcour_tableau(t_tetri *mainlist, char **final_carre, int y, int x);
 
 
 int check_block_plus(char *str, int x)
@@ -125,8 +125,7 @@ char **create_tableau(int size)
 		x++;
 	}
 	return (final_tab);
-} 
-
+}
 
 t_piece *cut_tetri_plus(t_piece *p)
 {
@@ -150,10 +149,9 @@ t_piece *cut_tetri_plus(t_piece *p)
 		p = p->prev;
 	}
 		p->y -= ytmp;
-		p->x -= xtmp;	
+		p->x -= xtmp;
 	return (p);
 }
-
 
 t_piece *cut_tetri(char *tetri)
 {
@@ -231,7 +229,13 @@ t_tetri *add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 
 
 
-int  test_2(t_tetri *mainlist, char **final_carre, int x, int y)
+
+
+
+
+
+
+int  test_2(t_tetri *mainlist, char **final_carre, int y, int x)
 {
 	while (mainlist->p->next != NULL)
 	{
@@ -260,8 +264,14 @@ int  test_2(t_tetri *mainlist, char **final_carre, int x, int y)
 	}
 }
 
-void test(t_tetri *mainlist, char **final_carre, int x, int y)
+
+
+
+
+
+void place(t_tetri *mainlist, char **final_carre, int y, int x)
 {
+	mainlist->is_valid = 1;
 	while (mainlist->p->next != NULL)
 	{
 		final_carre[y + mainlist->p->y][x + mainlist->p->x] =
@@ -274,6 +284,18 @@ void test(t_tetri *mainlist, char **final_carre, int x, int y)
 		mainlist->p = mainlist->p->prev;
 }
 
+void unplace(t_tetri *mainlist, char **final_carre, int y, int x) //
+{
+	mainlist->is_valid = 0;
+	while (mainlist->p->next != NULL)
+	{
+		final_carre[y + mainlist->p->y][x + mainlist->p->x] = '.';
+		mainlist->p = mainlist->p->next;
+	}
+	final_carre[y + mainlist->p->y][x + mainlist->p->x]  = '.';
+	while (mainlist->p->prev)
+		mainlist->p = mainlist->p->prev;
+}
 
 int test_isvalid(t_tetri *tmp)
 {
@@ -288,39 +310,66 @@ int test_isvalid(t_tetri *tmp)
 
 
 
+
+
+
 int solve_tetri_plus(t_tetri *mainlist, char **final_carre, int y, int x)
 {
 	t_tetri *tmp;
 
 	tmp = mainlist;
-	if (test_isvalid(tmp)) //
+	if (test_isvalid(tmp)) 
 		return (1);
-	y = 0;
-	while (final_carre[y] != NULL && tmp != NULL) // if 
+	while (tmp != NULL)
 	{
-		x = 0;
-		while (final_carre[y][x] != '\0' && tmp != NULL) // if 
+		while (final_carre[y])
 		{
-			while (tmp != NULL) // if 
+			if (tmp->is_valid == 0 && test_2(tmp, final_carre, y, x))
 			{
-				if (tmp->is_valid == 0 && test_2(tmp, final_carre, x, y))
-				{
-					tmp->is_valid = 1;
-					test(tmp, final_carre, x, y);
-					ft_puttab(final_carre);
-					if(solve_tetri_plus(mainlist, final_carre, y, x))
-						return (1);
-				}
+				place(tmp, final_carre, y, x);		
+				ft_puttab(final_carre);
+				if(solve_tetri_plus(mainlist, final_carre, y, x))
+					return (1);
 				else
-					tmp = tmp->next;
+					unplace(tmp, final_carre, y, x);
 			}
-			tmp = mainlist;
+			if (final_carre[y][x] == '\n' && final_carre[y])
+			{
+				x = -1;
+				y++;
+			}
 			x++;
 		}
-		y++;
+		x = 0;
+		y = 0;
+		tmp = tmp->next;
 	}
 	return (0);
 }
+
+
+
+
+
+
+int parcour_tableau(t_tetri *mainlist, char **final_carre, int y, int x)
+{
+	while (final_carre[y][x] != '.'  && final_carre[y]) 
+	{
+		if (final_carre[y][x] == '\n' && final_carre[y])
+		{
+			x = 0;
+			y++;
+		}
+		x++;
+	}
+	if(solve_tetri_plus(mainlist, final_carre, y, x))
+		return (1);
+ return (0);
+}
+
+
+
 
 void solve_tetri(t_tetri *mainlist, int size)
 {
@@ -328,10 +377,11 @@ void solve_tetri(t_tetri *mainlist, int size)
 	int y;
 	char **final_carre;
 	t_tetri *tmp;
+	t_tetri *tmp2;
 
-	tmp = mainlist;
 	x = 0;
 	y = 0;
+	tmp = mainlist;
 	final_carre = create_tableau(size);
 	if (solve_tetri_plus(mainlist, final_carre, y, x))
 		ft_puttab(final_carre);
@@ -346,6 +396,30 @@ void solve_tetri(t_tetri *mainlist, int size)
 		solve_tetri(tmp, (size + 1));
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 int		check_tetri(char *str)
 {
