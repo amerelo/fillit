@@ -6,7 +6,7 @@
 /*   By: amerelo <amerelo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/04 15:01:57 by amerelo           #+#    #+#             */
-/*   Updated: 2015/12/13 18:09:27 by amerelo          ###   ########.fr       */
+/*   Updated: 2015/12/18 14:56:10 by matirell         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,7 +238,7 @@ int	test_2(t_tetri *mainlist, char **final_carre, int y, int x)
 	}
 }
 
-void	place(t_tetri *mainlist, char **final_carre, int y, int x)
+void	ft_place(t_tetri *mainlist, char **final_carre, int y, int x)
 {
 	mainlist->is_valid = 1;
 	while (mainlist->p->next != NULL)
@@ -253,7 +253,7 @@ void	place(t_tetri *mainlist, char **final_carre, int y, int x)
 		mainlist->p = mainlist->p->prev;
 }
 
-void	unplace(t_tetri *mainlist, char **final_carre, int y, int x)
+void	ft_unplace(t_tetri *mainlist, char **final_carre, int y, int x)
 {
 	mainlist->is_valid = 0;
 	while (mainlist->p->next != NULL)
@@ -277,12 +277,11 @@ int	test_isvalid(t_tetri *tmp)
 	return (1);
 }
 
-int	solve_tetri_plus(t_tetri *mainlist, char **final_carre, int y, int x)
+int ft_solve_tetri_plus(t_tetri *mainlist, char **final_carre, int y, int x)
 {
 	t_tetri *tmp;
 
-	tmp = mainlist;
-	if (test_isvalid(tmp))
+	if ((tmp = mainlist) != NULL && test_isvalid(tmp))
 		return (1);
 	while (tmp != NULL)
 	{
@@ -290,19 +289,14 @@ int	solve_tetri_plus(t_tetri *mainlist, char **final_carre, int y, int x)
 		{
 			if (tmp->is_valid == 0 && test_2(tmp, final_carre, y, x))
 			{
-				place(tmp, final_carre, y, x);
-				ft_puttab(final_carre);
-				if (solve_tetri_plus(mainlist, final_carre, y, x))
+				ft_place(tmp, final_carre, y, x);
+				if (ft_solve_tetri_plus(mainlist, final_carre, y, x))
 					return (1);
 				else
-					unplace(tmp, final_carre, y, x);
+					ft_unplace(tmp, final_carre, y, x);
 			}
-			if (final_carre[y][x] == '\n' && final_carre[y])
-			{
-				x = -1;
-				y++;
-			}
-			x++;
+			x = (final_carre[y][x] == '\n' && final_carre[y]) ? -1 : x + 1;
+			y = (final_carre[y][x] == '\n' && final_carre[y]) ? y + 1 : y;
 		}
 		x = 0;
 		y = 0;
@@ -322,12 +316,12 @@ int	parcour_tableau(t_tetri *mainlist, char **final_carre, int y, int x)
 		}
 		x++;
 	}
-	if (solve_tetri_plus(mainlist, final_carre, y, x))
+	if (ft_solve_tetri_plus(mainlist, final_carre, y, x))
 		return (1);
 	return (0);
 }
 
-void	solve_tetri(t_tetri *mainlist, int size)
+void	ft_solve_tetri(t_tetri *mainlist, int size)
 {
 	int x;
 	int y;
@@ -339,7 +333,7 @@ void	solve_tetri(t_tetri *mainlist, int size)
 	y = 0;
 	tmp = mainlist;
 	final_carre = create_tableau(size);
-	if (solve_tetri_plus(mainlist, final_carre, y, x))
+	if (ft_solve_tetri_plus(mainlist, final_carre, y, x))
 		ft_puttab(final_carre);
 	else
 	{
@@ -349,20 +343,22 @@ void	solve_tetri(t_tetri *mainlist, int size)
 			mainlist->is_valid = 0;
 			mainlist = mainlist->next;
 		}
-		solve_tetri(tmp, (size + 1));
+		ft_solve_tetri(tmp, (size + 1));
 	}
 }
 
-int		check_tetri(char *str)
+int		ft_check_tetri(char *str)
 {
 	int			x;
 	int			i;
+	int			j;
 	char		*tmp;
 	t_tetri		*head;
 	t_tetri		*l_tmp;
 
-	x = 0;
-	while (str[x])
+	x = -1;
+	j = 0;
+	while (str[++x])
 	{
 		if (!(tmp = (char *)ft_memalloc(sizeof(char) * 21)))
 			return (0);
@@ -373,17 +369,12 @@ int		check_tetri(char *str)
 			tmp[i] = str[i + x];
 			i++;
 		}
-		x += i;
 		if (i != 20 || !(check_block(tmp)))
 			return (0);
-		if (str[x] == '\n' && str[x + 1] != '.' && str[x + 1] != '#')
-			return (0);
-		l_tmp = create_list_element(tmp, (x % 20));
-		head = add_on_list(head	, l_tmp, (x % 20));
-		x++;
+		l_tmp = create_list_element(tmp, (j));
+		head = add_on_list(head	, l_tmp, (j++));
 	}
-	x--;
-	solve_tetri(head, (x % 20 + 1));
+	ft_solve_tetri(head, (j));
 	return (1);
 }
 
@@ -400,7 +391,7 @@ int		main(int ac, char **av)
 		{
 			r = read(fi, buf, 1024);
 			buf[r] = '\0';
-			if (r == -1 || !check_tetri(buf))
+			if (r == -1 || !ft_check_tetri(buf))
 			{
 				ft_putendl("error");
 				close(fi);
