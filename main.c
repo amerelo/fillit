@@ -13,8 +13,6 @@
 #include "libft.h"
 #include <fcntl.h>
 
-int parcour_tableau(t_tetri *mainlist, char **final_carre, int y, int x);
-
 int	check_block_plus(char *str, int x)
 {
 	if (str[x - 1] == '#' && str[x - 5] == '#')
@@ -177,20 +175,6 @@ t_piece	*cut_tetri(char *tetri)
 	return (p);
 }
 
-t_tetri	*create_list_element(char *tetriminos, int x)
-{
-	t_tetri *new_tetri;
-
-	new_tetri = (t_tetri *)malloc(sizeof(t_tetri));
-	if (!new_tetri)
-		return (NULL);
-	new_tetri->p = cut_tetri(tetriminos);
-	new_tetri->tetri_nuber = x;
-	new_tetri->is_valid = 0;
-	new_tetri->next = NULL;
-	return (new_tetri);
-}
-
 t_tetri	*add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 {
 	t_tetri *tmp;
@@ -208,6 +192,21 @@ t_tetri	*add_on_list(t_tetri *head, t_tetri *l_tmp, int x)
 		head = l_tmp;
 	return (head);
 }
+
+t_tetri	*create_list_element(char *tetriminos, int x)
+{
+	t_tetri *l_tmp;
+
+	l_tmp = (t_tetri *)malloc(sizeof(t_tetri));
+	if (!l_tmp)
+		return (NULL);
+	l_tmp->p = cut_tetri(tetriminos);
+	l_tmp->tetri_nuber = x;
+	l_tmp->is_valid = 0;
+	l_tmp->next = NULL;
+	return (l_tmp);
+}
+
 
 int	test_2(t_tetri *mainlist, char **final_carre, int y, int x)
 {
@@ -321,7 +320,7 @@ int	parcour_tableau(t_tetri *mainlist, char **final_carre, int y, int x)
 	return (0);
 }
 
-void	ft_solve_tetri(t_tetri *mainlist, int size)
+int	ft_solve_tetri(t_tetri *mainlist, int size)
 {
 	int x;
 	int y;
@@ -343,39 +342,38 @@ void	ft_solve_tetri(t_tetri *mainlist, int size)
 			mainlist->is_valid = 0;
 			mainlist = mainlist->next;
 		}
-		ft_solve_tetri(tmp, (size + 1));
+		return (ft_solve_tetri(tmp, (size + 1)));
 	}
+	return (1);
 }
 
 int		ft_check_tetri(char *str)
 {
-	int			x;
-	int			i;
-	int			j;
-	char		*tmp;
-	t_tetri		*head;
-	t_tetri		*l_tmp;
+	t_tmp	u;
 
-	x = -1;
-	j = 0;
-	while (str[++x])
+	u.x = 0;
+	u.y = 0;
+	while (str[u.x])
 	{
-		if (!(tmp = (char *)ft_memalloc(sizeof(char) * 21)))
+		if (!(u.tmp = (char *)ft_memalloc(sizeof(char) * 21)))
 			return (0);
-		i = 0;
-		while (i < 20 && str[i + x] && (str[i + x] == '.' || str[i + x] == '#'
-		|| str[i + x] == '\n'))
+		u.i = 0;
+		while (u.i < 20 && str[u.i + u.x] && (str[u.i + u.x] == '.' ||
+		 str[u.i + u.x] == '#' || str[u.i + u.x] == '\n'))
 		{
-			tmp[i] = str[i + x];
-			i++;
+			u.tmp[u.i] = str[u.i + u.x];
+			u.i++;
 		}
-		if (i != 20 || !(check_block(tmp)))
+		u.x += u.i;
+		if ((u.i != 20 || !(check_block(u.tmp))) || \
+		(str[u.x] == '\n' && str[u.x + 1] != '.' && str[u.x + 1] != '#'))
 			return (0);
-		l_tmp = create_list_element(tmp, (j));
-		head = add_on_list(head	, l_tmp, (j++));
+		u.l_tmp = create_list_element(u.tmp, u.y);
+		u.head = add_on_list(u.head	, u.l_tmp, u.y);
+		u.x++;
+		u.y++;
 	}
-	ft_solve_tetri(head, (j));
-	return (1);
+	return (ft_solve_tetri(u.head, u.y));
 }
 
 int		main(int ac, char **av)

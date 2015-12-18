@@ -39,6 +39,15 @@ typedef struct		su_list
 	struct su_list	*next;
 }					t_tetri;
 
+typedef struct		s_tmp
+{
+	int			x;
+	int			i;
+	int			y;
+	char		*tmp;
+	t_tetri		*head;
+	t_tetri		*l_tmp;
+}					t_tmp;
 
 
 size_t				ft_strlen(const char *nb);
