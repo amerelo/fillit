@@ -389,7 +389,7 @@ int		main(int ac, char **av)
 		{
 			r = read(fi, buf, 1024);
 			buf[r] = '\0';
-			if (r == -1 || !ft_check_tetri(buf))
+			if (r < 1 || !ft_check_tetri(buf))
 			{
 				ft_putendl("error");
 				close(fi);
