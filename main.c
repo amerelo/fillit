@@ -6,7 +6,7 @@
 /*   By: amerelo <amerelo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/04 15:01:57 by amerelo           #+#    #+#             */
-/*   Updated: 2015/12/18 14:56:10 by matirell         ###   ########.fr       */
+/*   Updated: 2015/12/19 16:14:16 by amerelo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ char	**create_tableau(int size)
 	int		size_cube;
 	int		x;
 	int		y;
-	int		len;
 	char	**final_tab;
 
 	size_cube = 2;
@@ -326,7 +325,6 @@ int	ft_solve_tetri(t_tetri *mainlist, int size)
 	int y;
 	char **final_carre;
 	t_tetri *tmp;
-	t_tetri *tmp2;
 
 	x = 0;
 	y = 0;
@@ -393,7 +391,7 @@ int		main(int ac, char **av)
 			{
 				ft_putendl("error");
 				close(fi);
-				return (-1);
+				return (0);
 			}
 			close(fi);
 		}
