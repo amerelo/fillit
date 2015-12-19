@@ -1,42 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   ft_memset.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amerelo <amerelo@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2015/12/04 15:01:57 by amerelo           #+#    #+#             */
-/*   Updated: 2015/12/19 16:14:16 by amerelo          ###   ########.fr       */
+/*   Created: 2015/11/24 13:02:30 by amerelo           #+#    #+#             */
+/*   Updated: 2015/11/24 13:02:45 by amerelo          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int		main(int ac, char **av)
+void	*ft_memset(void *b, int c, size_t len)
 {
-	int		fi;
-	char	buf[1025];
-	int		r;
+	int		i;
+	char	*x;
 
-	if (ac == 2)
+	i = 0;
+	if (len == 0)
+		return (b);
+	x = (char *)b;
+	while (len--)
 	{
-		fi = open(av[1], O_RDONLY);
-		if (fi > 0)
-		{
-			r = read(fi, buf, 1024);
-			buf[r] = '\0';
-			if (r < 1 || !ft_check_tetri(buf))
-			{
-				ft_putendl("error");
-				close(fi);
-				return (0);
-			}
-			close(fi);
-		}
-		else
-			ft_putendl("error");
+		x[i] = c;
+		i++;
 	}
-	else
-		ft_putendl("error");
-	return (0);
+	return (b);
 }
