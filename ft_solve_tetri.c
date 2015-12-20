@@ -14,10 +14,10 @@
 
 int	ft_solve_tetri(t_tetri *mainlist, int size)
 {
-	int x;
-	int y;
-	char **final_carre;
-	t_tetri *tmp;
+	int		x;
+	int		y;
+	char	**final_carre;
+	t_tetri	*tmp;
 
 	x = 0;
 	y = 0;

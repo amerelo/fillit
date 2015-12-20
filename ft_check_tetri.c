@@ -12,7 +12,7 @@
 
 #include "fillit.h"
 
-int		ft_check_tetri(char *str)
+int	ft_check_tetri(char *str)
 {
 	t_tmp	u;
 
@@ -24,7 +24,7 @@ int		ft_check_tetri(char *str)
 			return (0);
 		u.i = 0;
 		while (u.i < 20 && str[u.i + u.x] && (str[u.i + u.x] == '.' ||
-		 str[u.i + u.x] == '#' || str[u.i + u.x] == '\n'))
+		str[u.i + u.x] == '#' || str[u.i + u.x] == '\n'))
 		{
 			u.tmp[u.i] = str[u.i + u.x];
 			u.i++;
